@@ -1,7 +1,43 @@
-import { Component } from "react";
+import { Component, useState, useEffect } from 'react';
 import CardList from "./components/card-list/card-list.component";
 import SearchBox from "./components/search-box/search-box.component";
+
 import "./App.css";
+
+export const AppFunctional = () => {
+  const [searchField, setSearchField] = useState(''); // [value, setValue]
+  const [monsters, setMonsters] = useState([]);
+  const [filteredMonsters, setFilteredMonsters] = useState(monsters);
+
+  // only run this on mount, [] dependency array is used for that
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((users) => setMonsters(users));
+  }, [])
+
+  // only update the filtered monsters list if monsters array
+  // or the search string changes
+  useEffect(() => {
+    const newFilteredMonsters = monsters.filter((monster) => {
+      return monster.name.toLowerCase().includes(searchField);
+    });
+    setFilteredMonsters(newFilteredMonsters);
+  }, [monsters, searchField]);
+
+  const onSearchChange = (event) => {
+    const searchFieldString = event.target.value.toLowerCase();
+    setSearchField(searchFieldString);
+  };
+
+  return (
+    <div className="App">
+      <h1 className="app-title">Monsters Rolodex</h1>
+      <SearchBox placeholder="search monsters" onChangeHandler={onSearchChange}/>
+      <CardList collection={filteredMonsters}/>
+    </div>
+  );
+}
 
 class App extends Component {
   constructor() {
