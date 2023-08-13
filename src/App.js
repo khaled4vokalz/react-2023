@@ -1,6 +1,6 @@
 import { Component, useState, useEffect } from 'react';
-import CardList from "./components/card-list/card-list.component";
-import SearchBox from "./components/search-box/search-box.component";
+import CardList, { CardListFunctional } from "./components/card-list/card-list.component";
+import SearchBox, { SearchBoxFunctional } from "./components/search-box/search-box.component";
 
 import "./App.css";
 
@@ -10,10 +10,13 @@ export const AppFunctional = () => {
   const [filteredMonsters, setFilteredMonsters] = useState(monsters);
 
   // only run this on mount, [] dependency array is used for that
+  // works as `componentDidMount` hook on Class Components
   useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/users")
       .then((response) => response.json())
-      .then((users) => setMonsters(users));
+      .then((users) => setMonsters(users.map(({ id, name, email }) => 
+        ({id, name, email, 
+          imageSrc:`https://robohash.org/${id}?set=set2&size=180x180` }))));
   }, [])
 
   // only update the filtered monsters list if monsters array
@@ -33,8 +36,8 @@ export const AppFunctional = () => {
   return (
     <div className="App">
       <h1 className="app-title">Monsters Rolodex</h1>
-      <SearchBox placeholder="search monsters" onChangeHandler={onSearchChange}/>
-      <CardList collection={filteredMonsters}/>
+      <SearchBoxFunctional placeholder="search monsters" onChangeHandler={onSearchChange}/>
+      <CardListFunctional collection={filteredMonsters}/>
     </div>
   );
 }
